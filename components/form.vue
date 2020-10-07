@@ -1,86 +1,26 @@
 <template>
 	<div class="my-6">
+		<button
+			class="bg-accent-red text-white shadow-custom font-light w-full py-4 px-6 rounded-lg inline-flex items-center h-12 focus:outline-none"
+			@click="showForm = !showForm; showButton = !showButton"
+			v-if="showButton"
+		>
+			<span>Add New Location</span>
 
-		<div v-if="showCard">
-			<div
-				:class="this.picked"
-				class="shadow-custom h-card py-12 px-6 rounded-lg relative z-10 text-white flex items-center justify-between"
-			>
-				<div>
-					<h3 class="text-2xl font-semibold leading-9">
-						{{ this.title }}
-					</h3>
-					<p class="text-base leading-6 font-light">{{ this.address }}</p>
-				</div>
-
-
-				<button
-					class="focus:outline-none"
-					@click="isOpen = !isOpen; isEditing = false"
-				>
-						<Chevron v-bind:class="{ 'rotate' : isOpen }"></Chevron>
-				</button>
-			</div>
-
-			<transition name="slide-open">
-				<div v-if="isOpen" class="shadow-custom bg-white px-6 py-4 -mt-1 rounded-lg px-6">
-					<h4
-						class="text-xl font-semibold leading-1875 text-dark-blue mt-6 mb-2"
-					>
-						{{ this.name }}
-					</h4>
-					<p class="text-base text-dark-blue font-light leading-6 mb-2">
-						{{ this.jobPosition }}
-					</p>
-					<a
-						:href="'mailto:' + this.email"
-						class="text-base text-accent-blue font-light leading-6 mb-2 inline-block w-full"
-					>
-						{{ this.email }}
-					</a>
-					<span
-						class="text-base text-dark-blue font-light leading-6 mb-4 inline-block"
-					>
-						{{ this.phone }}
-					</span>
-
-					<hr class="border-light-gray" />
-
-					<div class="flex justify-between mt-4 mb-2">
-						<button
-							@click="updateCard"
-							class="focus:outline-none uppercase text-xs text-primary-gray flex items-center"
-						>
-							<Edit></Edit>
-							edit
-						</button>
-
-						<button
-							@click="deleteCard(data)"
-							class="focus:outline-none uppercase text-xs text-accent-red flex items-center"
-						>
-							<Trash></Trash>
-							delete
-						</button>
-					</div>
-				</div>
-			</transition>
-		</div>
+			<Add></Add>
+		</button>
 
 		<transition name="slide-form">
-			<div v-if="isEditing">
+			<div v-if="showForm">
 				<div
 					class="form-wrapper"
 				>
 					<div class="flex items-center justify-between mb-10">
 						<h3 class="text-base font-bold text-dark-blue">
-							Edit Location
+							New Location
 						</h3>
 
-						<button
-							class="focus:outline-none"
-							@click="isEditing = !isEditing; showCard = !showCard"
-						>
+						<button class="focus:outline-none" @click="showButton = !showButton; showForm = !showForm">
 							<Close></Close>
 						</button>
 					</div>
@@ -119,8 +59,8 @@
 							/>
 							<label
 								:class="item.value"
-								:for="item.value"
 								class="absolute w-full h-select rounded-lg flex items-center justify-center"
+								:for="item.value"
 							>
 								<Check />
 							</label>
@@ -350,21 +290,19 @@
 
 <script>
 
-import Check from "./icons/check.vue";
-import Attention from "./icons/attention.vue";
+import Add from "./icons/add.vue";
 import Close from "./icons/close.vue";
-import Edit from "./icons/edit.vue";
+import Check from "./icons/check.vue";
 import Chevron from "./icons/chevron.vue";
-import Trash from "./icons/trash.vue";
+import Attention from "./icons/attention.vue";
 import { mask } from "vue-the-mask";
 
+
 export default {
-	props: ["data"],
-	data: function(){
-		return{
-			isOpen: false,
-			showCard: true,
-			isEditing: false,
+	data: function() {
+		return {
+			showForm: false,
+			showButton: true,
 			colorOpen: false,
 			disabledButton: true,
 			errors: {
@@ -375,13 +313,13 @@ export default {
 				email: null,
 				phone: null
 			},
-			picked: this.data.bg,
-			title: this.data.title,
-			address: this.data.address,
-			name: this.data.name,
-			jobPosition: this.data.jobPosition,
-			email: this.data.email,
-			phone: this.data.phone,
+			picked: "bg-primary-gray",
+			title: null,
+			address: null,
+			name: null,
+			jobPosition: null,
+			email: null,
+			phone: null,
 			emailValidator: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
 			bgOptions: [
 				{value: "bg-accent-yellow"},
@@ -390,18 +328,17 @@ export default {
 				{value: "bg-primary-gray"},
 				{value: "bg-dark-blue"}
 			]
-		}
+		};
 	},
 	directives:{
 		mask
 	},
 	components: {
-		Check,
+		Add,
+		Attention,
 		Close,
-		Edit,
+		Check,
 		Chevron,
-		Trash,
-		Attention
 	},
 	computed: {
 		isDisabled(){
@@ -409,14 +346,7 @@ export default {
 		}
 	},
 	methods: {
-		deleteCard: function(data){
-			$nuxt.$emit('removeCard', data);
-		},
-		updateCard: function(){
-			this.isEditing = true;
-			this.showCard = false;
-			this.isOpen = false;
-		},
+
 		sendForm: function(e) {
 			e.preventDefault();
 			this.errors = [];
@@ -451,28 +381,28 @@ export default {
 
 			this.disabledButton = true;
 
-			this.bg = this.picked,
-			this.title = this.title,
-			this.address = this.address,
-			this.name = this.name,
-			this.jobPosition = this.jobPosition,
-			this.email = this.email,
-			this.phone = this.phone
-
-			const updatedData = {
-				bg: this.bg,
+			const formData = {
+				bg: this.picked,
 				title: this.title,
 				address: this.address,
 				name: this.name,
 				jobPosition: this.jobPosition,
 				email: this.email,
-				phone: this.phone,
+				phone: this.phone
 			};
 
-			this.showCard = true;
-			this.isEditing = false;
+			this.showButton = true;
+			this.showForm = false;
 
-			$nuxt.$emit('updateCard', updatedData);
+			$nuxt.$emit('addCard', formData);
+
+			this.picked = 'bg-primary-gray';
+			this.title = '';
+			this.address = '';
+			this.name = '';
+			this.jobPosition = '';
+			this.email = '';
+			this.phone = '';
 		},
 		validEmail: function (email) {
 			var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -482,11 +412,3 @@ export default {
 };
 </script>
 
-<style lang="scss">
-
-	.rotate{
-		transition: all .3s;
-		transform: rotate(180deg);
-	}
-
-</style>
